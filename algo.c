@@ -18,34 +18,53 @@
 
 typedef struct Box {
     int value;
+    int number;
     struct Box *next;
-    struct Box *previous;
-    struct BoxList *boxList;
 } Box;
 
-Box *head = NULL;
-Box *tail = NULL;
 
+bool isInsideRect(int x, int y, SDL_Rect rect) {
+    return (x >= rect.x && x <= rect.x + rect.w &&
+            y >= rect.y && y <= rect.y + rect.h);
+}
+
+
+int index = 0;
+
+Box *head = NULL;
+
+int gap = 5, height_of_element = 50;
+int espace(int number) {return height_of_element * number + gap * ++number;};
+
+int box_height = 200;
 void create_box (SDL_Renderer *rend, int x, int y) {
-    SDL_Rect box = {x,y,200,200};
+    SDL_Rect box = {x,y,box_height,box_height};
     SDL_SetRenderDrawColor(rend, 225, 27, 27, 255);
     SDL_RenderFillRect (rend, &box);
 }
 
-void create_element_of_box (SDL_Renderer *rend, int x, int y, int red, int blue, int green, int opacity){
+void create_element_of_box (){
     Box *newBox = malloc(sizeof(Box));
-    newBox -> value = 3, newBox -> next = NULL;
-    if(tail == NULL) {
-        newBox -> previous = NULL;
+    newBox -> value = ++index, newBox -> next = NULL;
+    if(head == NULL) {
         head = newBox;
-    }else {
-        newBox -> previous = tail;
+    } else {
+        Box* temp=head;
+        while(temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newBox;
     }
-    tail = newBox;
-    SDL_Rect element = {x,y,75,75};
+    
+}
+void display_element_of_box (SDL_Renderer *rend, int red, int blue, int green, int opacity, int number) {
+
+    SDL_Rect element = {espace(number)%box_height,espace(espace(number) / (box_height-height_of_element) ),height_of_element,height_of_element};
     SDL_SetRenderDrawColor (rend,red,blue,green,opacity);
     SDL_RenderFillRect (rend, &element);
 }
+
+
 
 int main(int argc, char *argv[]) {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -81,23 +100,65 @@ int main(int argc, char *argv[]) {
 
 
     while (running) {
-    SDL_SetRenderDrawColor(rend, 203, 198,198 , 255);
-    SDL_RenderClear(rend);
+        SDL_SetRenderDrawColor(rend, 203, 198,198 , 255);
+        SDL_RenderClear(rend);
 
 
-    //creation des boites
-    create_box (rend, 0,0);
-    create_box (rend, 350,0);
-    create_box (rend, 650,0);
-    create_box (rend, 0,300);
-    create_box (rend, 350,300);
-    create_box (rend, 650,300);
-
-    create_element_of_box (rend,0,0,0,0,0,255); 
+        //creation des entrepots
+        create_box (rend, 0,0);
+        create_box (rend, 350,0);
+        create_box (rend, 650,0);
+        create_box (rend, 0,300);
+        create_box (rend, 350,300);
+        create_box (rend, 650,300);
 
 
+        //affichage des boxs
+        
+        display_element_of_box (rend,0,0,0,255,1); 
+        display_element_of_box (rend,0,0,0,255,2);
+        display_element_of_box (rend,0,0,0,255,3);  
+        display_element_of_box (rend,0,0,0,255,4);
+        display_element_of_box (rend,0,0,0,255,5);
+        display_element_of_box (rend,0,0,0,255,6);
+        display_element_of_box (rend,0,0,0,255,7);
+        display_element_of_box (rend,0,0,0,255,8);
+
+        SDL_Rect add_button = {775, 540, 200, 75};
+        SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
+        SDL_RenderFillRect (rend, &add_button);
+
+        SDL_Rect delete_button = {650, 540, 100, 75};
+        SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
+        SDL_RenderFillRect (rend, &delete_button);
 
 
+        
+        // TTF_Font *font = TTF_OpenFont("arial.ttf", 20);
+        // SDL_Color textColor = {255, 255, 255, 255};
+        // SDL_Surface *surface = TTF_RenderText_Solid(font, "Add Box", textColor);
+        // SDL_Texture *texture = SDL_CreateTextureFromSurface(rend, surface);
+        
+
+        // int text_width = surface->w;
+        // int text_height = surface->h;
+        // SDL_FreeSurface(surface);
+
+        // SDL_Rect renderQuad = {785, 550, text_width, text_height};
+        // SDL_RenderCopy(rend, texture, NULL, &renderQuad);
+        // SDL_DestroyTexture(texture);
+
+        // SDL_Surface *surface2 = TTF_RenderText_Solid(font, "Delete Box", textColor);
+        // SDL_Texture *texture2 = SDL_CreateTextureFromSurface(rend, surface2);
+        
+
+        // int text_width2 = surface2->w;
+        // int text_height2 = surface2->h;
+        // SDL_FreeSurface(surface2);
+
+        // SDL_Rect renderQuad2 = {785, 460, text_width2, text_height2};
+        // SDL_RenderCopy(rend, texture2, NULL, &renderQuad2);
+        // SDL_DestroyTexture(texture2);
 
 
         while (SDL_PollEvent(&event))  {
@@ -113,7 +174,18 @@ int main(int argc, char *argv[]) {
                         
                     }
                 break;
-                
+
+                case SDL_MOUSEBUTTONDOWN:
+                    if (event.button.button == SDL_BUTTON_LEFT) {
+                        if (isInsideRect(event.button.x, event.button.y, add_button)) {
+                            create_element_of_box();
+                            }
+                        }
+                        else if (isInsideRect(event.button.x, event.button.y, delete_button)){ 
+                            
+                        }
+                break;
+
                 case SDL_QUIT:  
                     running = false;
                 break;
@@ -123,12 +195,12 @@ int main(int argc, char *argv[]) {
         }
 
 
-    SDL_RenderPresent(rend);
-    SDL_Delay(1000/FPS);
+        SDL_RenderPresent(rend);
+        SDL_Delay(1000/FPS);
     }
 
     SDL_DestroyRenderer(rend);
-    SDL_DestroyWindow(wind);    
+    SDL_DestroyWindow(wind); 
     TTF_Quit();
     SDL_Quit();
     return 0;
