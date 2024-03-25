@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
 #include <SDL2/SDL.h>
@@ -20,6 +21,11 @@ typedef struct Box {
     int posY;
 } Box;
 
+typedef struct Element {
+    char name[1024];
+    int number;
+    struct Element *next;
+} Element;
 
 bool isInsideRect(int x, int y, SDL_Rect rect) {
     return (x >= rect.x && x <= rect.x + rect.w &&
@@ -29,11 +35,10 @@ bool isInsideRect(int x, int y, SDL_Rect rect) {
 
 int index[6] = {0,0,0,0,0,0};
 
-int compteur_fruits [1024] = {0};
-
 char buffer[100];
 
 Box *head[] = {NULL, NULL, NULL, NULL, NULL, NULL};
+Element *elemHead = NULL;
 
 int gap = 5, height_of_element = 50;
 int espace(int number) {return height_of_element * number + gap * ++number;};
@@ -68,15 +73,29 @@ void create_element_of_box (int boite, char nom[]){
         temp->next = newBox;
     }
 
-    if (strcmp(nom, "pomme") == 0) {
-        compteur_fruits[0]++;
-    }
-    if (strcmp(nom, "banana") == 0) {
-        compteur_fruits[1]++;   
-    }
-    if (strcmp(nom, "water") == 0) {
-        compteur_fruits[2]++;   
-    }
+    Element *checkElem = elemHead;
+    do {
+        if(checkElem != NULL && strcmp(nom, checkElem -> name) == 0) {
+            printf("7\n");
+            ++checkElem -> number;
+            break;
+        }
+        if(elemHead == NULL || checkElem -> next == NULL) {
+            printf("1\n");
+            Element *newElem = malloc(sizeof(Element));
+            strcpy(newElem -> name, nom);
+            ++newElem -> number;
+            newElem -> next = NULL;
+            if(elemHead == NULL) elemHead = newElem;
+            else checkElem -> next = newElem;
+
+            break;
+        }
+        printf("8\n");
+        checkElem = checkElem -> next;
+    } while(checkElem != NULL);
+printf("Hello2\n");
+
     
 }
 void display_element_of_box (SDL_Renderer *rend, int red, int blue, int green, int opacity, int number, int boite[2]) {
@@ -170,17 +189,24 @@ int main(int argc, char *argv[]) {
         Box *newElem = head[0];
         int posBox[2] = {0, 0};
         for(int nbBox = 0; newElem != NULL; ++nbBox) {
-            if (strcmp(newElem, "pomme") == 0)
+            if (strcmp(newElem->value, "pomme") == 0)
             {
                 display_element_of_box (rend,222, 41, 22, 255, nbBox, posBox);
             }
-            if (strcmp(newElem, "banana") == 0)
+            else if (strcmp(newElem->value, "banana") == 0)
             {
                 display_element_of_box (rend, 255, 255, 0, 255, nbBox, posBox);
             }
-            if (strcmp(newElem, "water") == 0)
+            else if (strcmp(newElem->value, "water") == 0)
             {
                 display_element_of_box (rend,  0,  127,  255, 255, nbBox, posBox);
+            } else {
+                int stoi = 0;
+                for (int i = 0; i < strlen(newElem->value); i++)
+                    stoi += newElem->value[i];
+                
+                srand(stoi);
+                display_element_of_box(rend, rand(), rand(), rand(), 255, nbBox, posBox);
             }
             
             
@@ -200,14 +226,24 @@ int main(int argc, char *argv[]) {
         SDL_RenderFillRect (rend, &infobar);
 
 
-        snprintf(buffer, sizeof(buffer), "Pommes : %d", compteur_fruits[0]);
-        display_text (rend,910,10,buffer);
+        printf("aaa\n");
+        Element *loopElement = elemHead;
+        for (int loopValue = 0; loopElement != NULL; ++loopValue)
+        {
+            snprintf(buffer, sizeof(buffer), "%s : %d", loopElement -> name, loopElement -> number);
+            display_text(rend, 910, 10+50*loopValue, buffer);
+            loopElement = loopElement -> next;
+        }
+         
 
-        snprintf(buffer, sizeof(buffer), "Banana : %d", compteur_fruits[1]);
-        display_text (rend,910,60,buffer);
+        // snprintf(buffer, sizeof(buffer), "Pommes : %d", elemHead->number);
+        // display_text (rend,910,10,buffer);
 
-        snprintf(buffer, sizeof(buffer), "Water : %d", compteur_fruits[2]);
-        display_text (rend,910,110,buffer);
+        // snprintf(buffer, sizeof(buffer), "Banana : %d", elemHead->next->number);
+        // display_text (rend,910,60,buffer);
+
+        // snprintf(buffer, sizeof(buffer), "Water : %d", compteur_fruits[2]);
+        // display_text (rend,910,110,buffer);
 
         printf("sorting by %c\n", sorting);
 
@@ -258,10 +294,13 @@ int main(int argc, char *argv[]) {
                 case SDL_MOUSEBUTTONDOWN:
                     if (event.button.button == SDL_BUTTON_LEFT) {
                         if (isInsideRect(event.button.x, event.button.y, add_button)) {
-                            create_element_of_box(0, "pomme");
+                            // create_element_of_box(0, "pomme");
                             // create_element_of_box(1, "pomme");
-                            create_element_of_box(0, "banana");
-                            create_element_of_box(0, "water");
+                            // create_element_of_box(0, "banana");
+                            // create_element_of_box(0, "water");
+                            create_element_of_box(0, "orange");
+                            //create_element_of_box(0, "milk");
+                            create_element_of_box(0, "pomme");
                             }
                         }
                         
