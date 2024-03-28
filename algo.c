@@ -39,6 +39,7 @@ char buffer[100];
 
 Box *head[] = {NULL, NULL, NULL, NULL, NULL, NULL};
 Element *elemHead = NULL;
+int elementNumber = 0;
 
 int gap = 5, height_of_element = 50;
 int espace(int number) {return height_of_element * number + gap * ++number;};
@@ -88,6 +89,7 @@ void create_element_of_box (int boite, char nom[]){
             newElem -> next = NULL;
             if(elemHead == NULL) elemHead = newElem;
             else checkElem -> next = newElem;
+            ++elementNumber;
 
             break;
         }
@@ -134,8 +136,35 @@ void display_text (SDL_Renderer *rend,int x, int y, char write[2048]) {
         SDL_DestroyTexture(texture);
 }
 
-
-
+void swap(Element* a, Element* b)
+{
+    Element temp = *a;
+    *a = *b;
+    *b = temp;
+}
+ 
+void swapElements(Element** head_ref, int x, int y)
+{
+    // Nothing to do if x and y are same
+    if (x == y)
+        return;
+    Element **a = NULL, **b = NULL;
+    // search for x and y in the linked list
+    // and store their pointer in a and b
+    while (*head_ref) {
+        if ((*head_ref)->name == x)
+            a = head_ref;
+        else if ((*head_ref)->name == y)
+            b = head_ref;
+        head_ref = &((*head_ref)->next);
+    }
+    // if we have found both a and b in the linked list swap
+    // current pointer and next pointer of these
+    if (a && b) {
+        swap(*a, *b);
+        swap(((*a)->next), ((*b)->next));
+    }
+}
 
 int main(int argc, char *argv[]) {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -226,16 +255,65 @@ int main(int argc, char *argv[]) {
         SDL_RenderFillRect (rend, &infobar);
 
 
-        printf("aaa\n");
+        Element *sortElement = elemHead;
+        int loopValue = 0;
+        for(loopValue; sortElement != NULL; ++loopValue){
+            // Absolutly not fake sorting algorythm
+            if (sorting == 'A'){ 
+                // snprintf(buffer, sizeof(buffer), "%s : %d", elemHead -> next -> name, elemHead -> next -> number);
+                // display_text(rend, 910, 10+50*0, buffer);
+                // snprintf(buffer, sizeof(buffer), "%s : %d", elemHead -> name, elemHead -> number);
+                // display_text(rend, 910, 10+50*1, buffer);
+                if(sortElement -> next != NULL) {
+                    char jaipludidai[1024];
+                    char onparladsu[1024];
+                    strcpy(jaipludidai, sortElement -> name);
+                    strcpy(onparladsu, sortElement -> next -> name);
+                    printf("%d vs %d\n", jaipludidai[0], onparladsu[0]);
+                    if(jaipludidai[0] > onparladsu[0]) {
+                        printf("prq\n");
+                        swapElements(&elemHead, loopValue, loopValue+1);
+
+                    }
+                }
+            }
+
+            else if (sorting == 'N'){
+                // snprintf(buffer, sizeof(buffer), "%s : %d", elemHead -> name, elemHead -> number);
+                // display_text(rend, 910, 10+50*0, buffer);
+                // snprintf(buffer, sizeof(buffer), "%s : %d", elemHead -> next -> name, elemHead -> next -> number);
+                // display_text(rend, 910, 10+50*1, buffer);
+
+                if(sortElement -> next != NULL) {
+                    if(sortElement < sortElement -> next) {
+                        printf("%s\n", sortElement -> name);
+                        swapElements(&elemHead, loopValue, loopValue+1);
+
+                    }
+                }
+            }
+            sortElement = sortElement -> next;
+        }
+
+
+
         Element *loopElement = elemHead;
-        for (int loopValue = 0; loopElement != NULL; ++loopValue)
+        // Element *nextElement = NULL;
+        // int arraySorted[1024] = {0};
+        // char arrayName[1024][1024];
+        for (int loopThroughValue = 0; loopThroughValue < loopValue; ++loopThroughValue)
         {
             snprintf(buffer, sizeof(buffer), "%s : %d", loopElement -> name, loopElement -> number);
-            display_text(rend, 910, 10+50*loopValue, buffer);
+            display_text(rend, 910, 10+50*loopThroughValue, buffer);
+
             loopElement = loopElement -> next;
         }
-         
 
+    
+
+
+        // for (int j = 0; arraySorted[j]; ++j){
+        //  }
         // snprintf(buffer, sizeof(buffer), "Pommes : %d", elemHead->number);
         // display_text (rend,910,10,buffer);
 
@@ -245,7 +323,6 @@ int main(int argc, char *argv[]) {
         // snprintf(buffer, sizeof(buffer), "Water : %d", compteur_fruits[2]);
         // display_text (rend,910,110,buffer);
 
-        printf("sorting by %c\n", sorting);
 
 
 
@@ -277,6 +354,9 @@ int main(int argc, char *argv[]) {
         display_text (rend,920,470,"Ordre decroissant");
 
 
+
+
+
         while (SDL_PollEvent(&event))  {
             switch (event.type)  {
                 case SDL_WINDOWEVENT:
@@ -298,9 +378,10 @@ int main(int argc, char *argv[]) {
                             // create_element_of_box(1, "pomme");
                             // create_element_of_box(0, "banana");
                             // create_element_of_box(0, "water");
-                            create_element_of_box(0, "orange");
-                            //create_element_of_box(0, "milk");
                             create_element_of_box(0, "pomme");
+                            create_element_of_box(0, "orange");
+                            // create_element_of_box(0, "orange");
+                            //create_element_of_box(0, "milk");
                             }
                         }
                         
