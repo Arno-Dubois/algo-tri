@@ -85,7 +85,7 @@ void create_element_of_box (int boite, char nom[]){
             printf("1\n");
             Element *newElem = malloc(sizeof(Element));
             strcpy(newElem -> name, nom);
-            ++newElem -> number;
+            newElem -> number = 1;
             newElem -> next = NULL;
             if(elemHead == NULL) elemHead = newElem;
             else checkElem -> next = newElem;
@@ -186,6 +186,65 @@ void swapElements(struct Element** head_ref,
     currX->next = temp;
 }
 
+void swapBoxs(struct Box** head_ref, 
+               char x[1024], char y[1024])
+{
+    printf("%s %s\n", x, y);
+    // Nothing to do if x and y are same
+    if (x == y)
+        return;
+
+    printf("x==y\n");
+ 
+    // Search for x (keep track of prevX and CurrX
+    struct Box *prevX = NULL, *currX = *head_ref;
+    while (currX && strcmp(currX->value, x) != 0) 
+    {
+        printf("currX %s", currX);
+        prevX = currX;
+        currX = currX->next;
+    }
+ 
+    // Search for y (keep track of prevY and CurrY
+    struct Box *prevY = NULL, *currY = currX;
+    while (currY && strcmp(currY->value, y) != 0) 
+    {
+        printf("currY %s", currY);
+        prevY = currY;
+        currY = currY->next;
+    }
+ 
+    // If either x or y is not present, 
+    // nothing to do
+    if (currX == NULL || currY == NULL)
+        return;
+
+    printf("CurrX\n");
+    
+ 
+    // If x is not head of linked list
+    if (prevX != NULL)
+        prevX->next = currY;
+    else
+ 
+        // Else make y as new head
+        *head_ref = currY;
+ 
+    // If y is not head of linked list
+    if (prevY != NULL)
+        prevY->next = currX;
+    else
+        
+        // Else make x as new head
+        *head_ref = currX;
+ 
+    // Swap next pointers
+    struct Box* temp = currY->next;
+    currY->next = currX->next;
+    currX->next = temp;
+    printf("head \n");
+}
+
 int main(int argc, char *argv[]) {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         printf("Error initializing SDL: %s\n", SDL_GetError());
@@ -238,6 +297,7 @@ int main(int argc, char *argv[]) {
         Box *newElem = head[0];
         int posBox[2] = {0, 0};
         for(int nbBox = 0; newElem != NULL; ++nbBox) {
+            printf("box %s\n", newElem -> value);
             if (strcmp(newElem->value, "pomme") == 0)
             {
                 display_element_of_box (rend,222, 41, 22, 255, nbBox, posBox);
@@ -278,18 +338,13 @@ int main(int argc, char *argv[]) {
         Element *sortElement = elemHead;
         int loopValue = 0;
         for(loopValue; sortElement != NULL; ++loopValue){
-            // Absolutly not fake sorting algorythm
-            if (sorting == 'A'){ 
-                // snprintf(buffer, sizeof(buffer), "%s : %d", elemHead -> next -> name, elemHead -> next -> number);
-                // display_text(rend, 910, 10+50*0, buffer);
-                // snprintf(buffer, sizeof(buffer), "%s : %d", elemHead -> name, elemHead -> number);
-                // display_text(rend, 910, 10+50*1, buffer);
-                if(sortElement -> next != NULL) {
-                    char jaipludidai[1024];
-                    char onparladsu[1024];
-                    strcpy(jaipludidai, sortElement -> name);
-                    strcpy(onparladsu, sortElement -> next -> name);
+            char jaipludidai[1024];
+            strcpy(jaipludidai, sortElement -> name);
+            if(sortElement -> next != NULL) {
+                char onparladsu[1024];
+                strcpy(onparladsu, sortElement -> next -> name);
 
+                if (sorting == 'A'){
                     for (int i = 0; jaipludidai[i]; i++)
                     {
                         printf("for\n");
@@ -303,28 +358,34 @@ int main(int argc, char *argv[]) {
                         }
                     }
                     
-                   
+                }
+
+                else if (sorting == 'N'){
+                    if(sortElement -> number < sortElement -> next -> number) {
+                        swapElements(&elemHead, jaipludidai, onparladsu);
+
+                    }
                     
                 }
             }
 
-            else if (sorting == 'N'){
-                // snprintf(buffer, sizeof(buffer), "%s : %d", elemHead -> name, elemHead -> number);
-                // display_text(rend, 910, 10+50*0, buffer);
-                // snprintf(buffer, sizeof(buffer), "%s : %d", elemHead -> next -> name, elemHead -> next -> number);
-                // display_text(rend, 910, 10+50*1, buffer);
 
-                if(sortElement -> next != NULL) {
-                    if(sortElement -> number < sortElement -> next -> number) {
-                        char jaipludidai[1024];
-                        char onparladsu[1024];
-                        strcpy(jaipludidai, sortElement -> name);
-                        strcpy(onparladsu, sortElement -> next -> name);
-                        swapElements(&elemHead, jaipludidai, onparladsu);
-
-                    }
+            Box *loopThroughBox = head[0];
+            int headPos = 0;
+            for(int loopThroughBoxValue = 0; loopThroughBox != NULL; ++loopThroughBoxValue) {
+                char bocValue[1024];
+                strcpy(bocValue, loopThroughBox -> value);
+                printf("%s\n", bocValue);
+                if(strcmp(jaipludidai, bocValue) != 0) {
+                    swapBoxs(&head[0], jaipludidai, bocValue)                     ;
                 }
+
+                loopThroughBox = loopThroughBox -> next;
             }
+
+
+
+
             sortElement = sortElement -> next;
         }
 
@@ -413,8 +474,9 @@ int main(int argc, char *argv[]) {
                             // create_element_of_box(0, "banana");
                             // create_element_of_box(0, "water");
                             create_element_of_box(0, "pomme");
-                            create_element_of_box(0, "orange");
+                            create_element_of_box(0, "banana");
                             create_element_of_box(0, "pomme");
+                            create_element_of_box(0, "water");
                             // create_element_of_box(0, "orange");
                             //create_element_of_box(0, "milk");
                             }
