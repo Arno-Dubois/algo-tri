@@ -48,7 +48,7 @@ int maxBox;
 
 
 
-char sorting = 'A';
+char sorting = 'N';
 
 int box_height = 200;
 void create_box (SDL_Renderer *rend, int x, int y) {
@@ -136,34 +136,54 @@ void display_text (SDL_Renderer *rend,int x, int y, char write[2048]) {
         SDL_DestroyTexture(texture);
 }
 
-void swap(Element* a, Element* b)
-{
-    Element temp = *a;
-    *a = *b;
-    *b = temp;
-}
- 
-void swapElements(Element** head_ref, int x, int y)
+void swapElements(struct Element** head_ref, 
+               char x[1024], char y[1024])
 {
     // Nothing to do if x and y are same
     if (x == y)
         return;
-    Element **a = NULL, **b = NULL;
-    // search for x and y in the linked list
-    // and store their pointer in a and b
-    while (*head_ref) {
-        if ((*head_ref)->name == x)
-            a = head_ref;
-        else if ((*head_ref)->name == y)
-            b = head_ref;
-        head_ref = &((*head_ref)->next);
+ 
+    // Search for x (keep track of prevX and CurrX
+    struct Element *prevX = NULL, *currX = *head_ref;
+    while (currX && strcmp(currX->name, x) != 0) 
+    {
+        prevX = currX;
+        currX = currX->next;
     }
-    // if we have found both a and b in the linked list swap
-    // current pointer and next pointer of these
-    if (a && b) {
-        swap(*a, *b);
-        swap(((*a)->next), ((*b)->next));
+ 
+    // Search for y (keep track of prevY and CurrY
+    struct Element *prevY = NULL, *currY = *head_ref;
+    while (currY && strcmp(currY->name, y) != 0) 
+    {
+        prevY = currY;
+        currY = currY->next;
     }
+ 
+    // If either x or y is not present, 
+    // nothing to do
+    if (currX == NULL || currY == NULL)
+        return;
+ 
+    // If x is not head of linked list
+    if (prevX != NULL)
+        prevX->next = currY;
+    else
+ 
+        // Else make y as new head
+        *head_ref = currY;
+ 
+    // If y is not head of linked list
+    if (prevY != NULL)
+        prevY->next = currX;
+    else
+        
+        // Else make x as new head
+        *head_ref = currX;
+ 
+    // Swap next pointers
+    struct Element* temp = currY->next;
+    currY->next = currX->next;
+    currX->next = temp;
 }
 
 int main(int argc, char *argv[]) {
@@ -269,12 +289,22 @@ int main(int argc, char *argv[]) {
                     char onparladsu[1024];
                     strcpy(jaipludidai, sortElement -> name);
                     strcpy(onparladsu, sortElement -> next -> name);
-                    printf("%d vs %d\n", jaipludidai[0], onparladsu[0]);
-                    if(jaipludidai[0] > onparladsu[0]) {
-                        printf("prq\n");
-                        swapElements(&elemHead, loopValue, loopValue+1);
 
+                    for (int i = 0; jaipludidai[i]; i++)
+                    {
+                        printf("for\n");
+                        if (jaipludidai[i] > onparladsu[i]){
+                            printf("<\n");
+                            swapElements(&elemHead, jaipludidai, onparladsu);
+                        }
+                        if (jaipludidai[i] != onparladsu[i]) {
+                            printf("!=\n");
+                            break;
+                        }
                     }
+                    
+                   
+                    
                 }
             }
 
@@ -285,9 +315,12 @@ int main(int argc, char *argv[]) {
                 // display_text(rend, 910, 10+50*1, buffer);
 
                 if(sortElement -> next != NULL) {
-                    if(sortElement < sortElement -> next) {
-                        printf("%s\n", sortElement -> name);
-                        swapElements(&elemHead, loopValue, loopValue+1);
+                    if(sortElement -> number < sortElement -> next -> number) {
+                        char jaipludidai[1024];
+                        char onparladsu[1024];
+                        strcpy(jaipludidai, sortElement -> name);
+                        strcpy(onparladsu, sortElement -> next -> name);
+                        swapElements(&elemHead, jaipludidai, onparladsu);
 
                     }
                 }
@@ -303,6 +336,7 @@ int main(int argc, char *argv[]) {
         // char arrayName[1024][1024];
         for (int loopThroughValue = 0; loopThroughValue < loopValue; ++loopThroughValue)
         {
+            printf("crash\n");
             snprintf(buffer, sizeof(buffer), "%s : %d", loopElement -> name, loopElement -> number);
             display_text(rend, 910, 10+50*loopThroughValue, buffer);
 
@@ -380,6 +414,7 @@ int main(int argc, char *argv[]) {
                             // create_element_of_box(0, "water");
                             create_element_of_box(0, "pomme");
                             create_element_of_box(0, "orange");
+                            create_element_of_box(0, "pomme");
                             // create_element_of_box(0, "orange");
                             //create_element_of_box(0, "milk");
                             }
