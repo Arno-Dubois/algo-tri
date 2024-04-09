@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -317,16 +318,27 @@ int main(int argc, char *argv[]) {
                 srand(stoi);
                 display_element_of_box(rend, rand(), rand(), rand(), 255, nbBox, posBox);
             }
-            
-            
+
             newElem = newElem->next;
-            
         }
+
         Box *newElemB = head[1];
-        int posBoxB[2] = {1000, 0};
+        int posBoxB[2] = {350, 0};
         for(int nbBox = 0; newElemB != NULL; ++nbBox) {
-            display_element_of_box (rend,0,0,0,255,nbBox, posBoxB);
+            int stoi = 0;
+            for (int i = 0; i < strlen(newElemB->value); i++)
+                stoi += newElemB->value[i];
+            
+            srand(stoi);
+            display_element_of_box(rend, rand(), rand(), rand(), 255, nbBox, posBoxB);
             newElemB = newElemB->next;
+        }
+        
+        Box *file = head[1];
+        if(file != NULL) {
+            create_element_of_box(0, file -> value);
+            head[1] = file -> next;
+            free(file);
         }
 
         // InfoBar
@@ -473,10 +485,12 @@ int main(int argc, char *argv[]) {
                             // create_element_of_box(1, "pomme");
                             // create_element_of_box(0, "banana");
                             // create_element_of_box(0, "water");
-                            create_element_of_box(0, "pomme");
-                            create_element_of_box(0, "banana");
-                            create_element_of_box(0, "pomme");
-                            create_element_of_box(0, "water");
+                            create_element_of_box(1, "pomme");
+                            create_element_of_box(1, "banana");
+                            create_element_of_box(1, "myrtille");
+                            create_element_of_box(1, "water");
+                            create_element_of_box(1, "orange");
+                           // create_element_of_box(0, "milk");
                             // create_element_of_box(0, "orange");
                             //create_element_of_box(0, "milk");
                             }
